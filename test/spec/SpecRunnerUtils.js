@@ -227,12 +227,35 @@ define(function (require, exports, module) {
         var deferred = new $.Deferred();
 
         runs(function () {
-            var dir = FileSystem.getDirectoryForPath(getTempDirectory()).create(function (err) {
-                if (err && err !== FileSystemError.ALREADY_EXISTS) {
-                    deferred.reject(err);
-                } else {
-                    deferred.resolve();
+            var dir = FileSystem.getDirectoryForPath(getTempDirectory());
+            
+            dir.exists(function (exists) {
+                function watchAndFinish() {
+                    FileSystem.unwatch(dir, function () {
+                        FileSystem.watch(dir, function () { return true; }, function (err) {
+                            if (err) {
+                                deferred.reject(err);
+                                return;
+                            }
+                            
+                            deferred.resolve();
+                        });
+                    });
                 }
+
+                if (exists) {
+                    watchAndFinish();
+                    return;
+                }
+
+                dir.create(function (err) {
+                    if (err) {
+                        deferred.reject(err);
+                        return;
+                    }
+                    
+                    watchAndFinish();
+                });
             });
         });
 
@@ -280,7 +303,10 @@ define(function (require, exports, module) {
         
         runs(function () {
             _resetPermissionsOnSpecialTempFolders().done(function () {
-                deletePath(baseDir, true).then(deferred.resolve, deferred.reject);
+                var baseDirEntry = FileSystem.getDirectoryForPath(baseDir);
+                FileSystem.unwatch(baseDirEntry, function (err) {
+                    deletePath(baseDir, true).then(deferred.resolve, deferred.reject);
+                });
             }).fail(function () {
                 deferred.reject();
             });
