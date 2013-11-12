@@ -153,8 +153,14 @@ define(function (require, exports, module) {
             if (err) {
                 callback(_mapError(err));
             } else {
-                var options = { isFile: stats.isFile(), mtime: stats.mtime, size: stats.size },
-                    fsStats = new FileSystemStats(options);
+                var options = {
+                        isFile: stats.isFile(),
+                        mtime: stats.mtime,
+                        size: stats.size,
+                        hash: stats.mtime.getTime()
+                    };
+                
+                var fsStats = new FileSystemStats(options);
                 
                 callback(null, fsStats);
             }
@@ -259,10 +265,10 @@ define(function (require, exports, module) {
         });
     }
     
-    function writeFile(path, data, options, callback) {
+    function writeFile(path, data, hash, options, callback) {
         var encoding = options.encoding || "utf8";
         
-        exists(path, function (alreadyExists) {
+        function _finishWrite(alreadyExists) {
             appshell.fs.writeFile(path, data, encoding, function (err) {
                 if (err) {
                     callback(_mapError(err));
@@ -281,8 +287,28 @@ define(function (require, exports, module) {
                     });
                 }
             });
-        });
+        }
         
+        // TODO: replace this with a call to exists once #5966 lands
+        stat(path, function (err, stats) {
+            if (err) {
+                switch (err) {
+                case FileSystemError.NOT_FOUND:
+                    _finishWrite(false);
+                    break;
+                default:
+                    callback(err);
+                }
+                return;
+            }
+            
+            if (hash !== stats._hash) {
+                callback(FileSystemError.CONTENTS_MODIFIED);
+                return;
+            }
+            
+            _finishWrite(path, data, encoding, true, callback);
+        });
     }
     
     function unlink(path, callback) {

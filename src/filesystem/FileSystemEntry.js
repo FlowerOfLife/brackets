@@ -170,6 +170,11 @@ define(function (require, exports, module) {
      * @param {function (boolean)} callback Callback with a single parameter.
      */
     FileSystemEntry.prototype.exists = function (callback) {
+        if (this._stat) {
+            callback(true);
+            return;
+        }
+        
         this._impl.exists(this._path, callback);
     };
     
@@ -180,6 +185,11 @@ define(function (require, exports, module) {
      *      FileSystemError string or FileSystemStats object.
      */
     FileSystemEntry.prototype.stat = function (callback) {
+        if (this._stat) {
+            callback(null, this._stat);
+            return;
+        }
+        
         this._impl.stat(this._path, function (err, stat) {
             if (!err) {
                 this._stat = stat;

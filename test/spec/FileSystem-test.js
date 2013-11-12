@@ -444,6 +444,7 @@ define(function (require, exports, module) {
                 runs(function () {
                     expect(firstReadCB.error).toBeFalsy();
                     expect(firstReadCB.data).toBe("File 4 Contents");
+                    expect(firstReadCB.stat).toBeTruthy();
                 });
                 
                 // Write new contents
@@ -463,6 +464,7 @@ define(function (require, exports, module) {
                 runs(function () {
                     expect(secondReadCB.error).toBeFalsy();
                     expect(secondReadCB.data).toBe(newContents);
+                    expect(secondReadCB.stat).toBeTruthy();
                 });
             });
             
@@ -476,6 +478,8 @@ define(function (require, exports, module) {
                 waitsFor(function () { return cb.wasCalled; });
                 runs(function () {
                     expect(cb.error).toBe(FileSystemError.NOT_FOUND);
+                    expect(cb.data).toBeFalsy();
+                    expect(cb.stat).toBeFalsy();
                 });
             });
             
@@ -505,6 +509,7 @@ define(function (require, exports, module) {
                 runs(function () {
                     expect(readCb.error).toBeFalsy();
                     expect(readCb.data).toBe(newContents);
+                    expect(readCb.stat).toBeTruthy();
                 });
             });
         });
