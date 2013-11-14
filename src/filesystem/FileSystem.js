@@ -496,12 +496,15 @@ define(function (require, exports, module) {
         }
         
         this._impl.stat(path, function (err, stat) {
-            if (!err) {
-                if (stat.isFile) {
-                    item = this.getFileForPath(path);
-                } else {
-                    item = this.getDirectoryForPath(path);
-                }
+            if (err) {
+                callback(err);
+                return;
+            }
+            
+            if (stat.isFile) {
+                item = this.getFileForPath(path);
+            } else {
+                item = this.getDirectoryForPath(path);
             }
             callback(err, item, stat);
         }.bind(this));

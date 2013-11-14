@@ -86,10 +86,15 @@ define(function (require, exports, module) {
         }
         
         this._impl.readFile(this._path, options, function (err, data, stat) {
-            if (!err) {
-                this._stat = stat;
-                this._contents = data;
+            if (err) {
+                this._clearCachedData();
+                callback(err);
+                return;
             }
+
+            this._stat = stat;
+            this._contents = data;
+            
             callback(err, data, stat);
         }.bind(this));
     };
@@ -116,10 +121,15 @@ define(function (require, exports, module) {
         
         this._impl.writeFile(this._path, data, hash, options, function (err, stat) {
             try {
-                if (!err) {
-                    this._stat = stat;
-                    this._contents = data;
+                if (err) {
+                    this._clearCachedData();
+                    callback(err);
+                    return;
                 }
+
+                this._stat = stat;
+                this._contents = data;
+                
                 callback(err, stat);
             } finally {
                 this._fileSystem._endWrite();  // unblock generic change events

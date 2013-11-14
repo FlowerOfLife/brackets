@@ -303,6 +303,7 @@ define(function (require, exports, module) {
             }
             
             if (hash !== stats._hash) {
+                console.warn("Blind write attempted: ", path, stats._hash, hash);
                 callback(FileSystemError.CONTENTS_MODIFIED);
                 return;
             }
