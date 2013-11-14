@@ -709,6 +709,8 @@ define(function (require, exports, module) {
      * Append custom view to editor-holder
      * @param {!Object} provider  custom view provider
      * @param {!string} fullPath  path to the file displayed in the custom view
+     * @return {!Promise} A promise resolved after image is displayed, rejected when 
+     *   image file not found.
      */
     function showCustomViewer(provider, fullPath) {
         var result = new $.Deferred();
