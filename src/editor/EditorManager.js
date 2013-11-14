@@ -751,7 +751,7 @@ define(function (require, exports, module) {
         var file = FileSystem.getFileForPath(fullPath);
         file.exists(_doShow);
         
-        return result;
+        return result.promise();
     }
                
 
