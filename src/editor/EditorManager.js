@@ -701,7 +701,7 @@ define(function (require, exports, module) {
      */
     function closeCustomViewer() {
         _removeCustomViewer();
-        _setCurrentlyViewedPath();
+        _currentlyViewedPath = "";
         _showNoEditor();
     }
     
@@ -721,7 +721,7 @@ define(function (require, exports, module) {
                 // and view provider are still the same.
                 if (_currentlyViewedPath === fullPath &&
                         _currentViewProvider === provider) {
-                        result.resolve();
+                    result.resolve();
                     return;
                 }
                 
@@ -751,7 +751,7 @@ define(function (require, exports, module) {
         var file = FileSystem.getFileForPath(fullPath);
         file.exists(_doShow);
         
-        return result;
+        return result.promise();
     }
                
 
