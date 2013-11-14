@@ -721,7 +721,7 @@ define(function (require, exports, module) {
                 // and view provider are still the same.
                 if (_currentlyViewedPath === fullPath &&
                         _currentViewProvider === provider) {
-                        result.resolve();
+                    result.resolve();
                     return;
                 }
                 
